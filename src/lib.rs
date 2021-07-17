@@ -18,22 +18,20 @@ pub fn to_url(tokens: TokenStream) -> TokenStream {
         _ => panic!("Only structs with named fields can be annotated with ToUrl"),
     };
 
-    let template: String = fields
-        .clone()
-        .iter()
-        .map(|f| f.ident.clone().unwrap().to_string() + "={}&")
-        .collect();
-
-    let pups = fields.iter().next().unwrap().clone().ident.unwrap();
+    let fields = fields.iter().map(|field| {
+        let field = field.ident.as_ref().unwrap();
+        quote! { + &format!("{}={:?}&", stringify!(#field), self.#field) }
+    });
 
     let modified = quote! {
         impl<'a> #name<'a> {
             pub fn to_url(&self, url: String) -> String {
 
-                println!("{}{}{}", url, #template, self.#pups);
+                let url = url #(#fields)*;
 
-                "dummy".to_string()
+                println!("URL: {}", url);
 
+                url
             }
         }
     };
