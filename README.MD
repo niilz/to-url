@@ -54,8 +54,8 @@ mod tests {
             nonce: "80085-3531".to_string(),
         };
 
-				// Call `to_url` on the insance, passing in a base-url
-				let url = dummy_req.to_url("https://dummy-base-url".to_string());
+        // Call `to_url` on the insance, passing in a base-url
+        let url = dummy_req.to_url("https://dummy-base-url".to_string());
 
         // All fields are collected into one url with query string
         assert_eq!(
