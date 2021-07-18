@@ -13,7 +13,8 @@ This library has been developed to try out how procedural macros in Rust, specif
 
 Note: This is not a macro for production!
 
-But if the derive attribute `ToUrl` is added to a struct (only structs are supported) then a `to_url(&self, base_url: String) -> String` gets implemented for that struct.  
+If the derive attribute `ToUrl` is added to a struct (only structs are supported) then a  
+`to_url(&self, base_url: String) -> String` method gets implemented for that struct.  
 This method, if called with a `String` first adds a `?` (question mark), the start of a query.
 It then iterates over all fields and joins them in the form `field=value` and adds them to the base_url.  
 If the `struct` has more than one field, the pairs are concatenated with an `&` (ampersand).  
