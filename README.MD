@@ -15,10 +15,11 @@ Note: This is not a macro for production!
 
 If the derive attribute `ToUrl` is added to a struct (only structs are supported) then a  
 `to_url(&self, base_url: String) -> String` method gets implemented for that struct.  
-This method, if called with a `String` first adds a `?` (question mark), the start of a query.
-It then iterates over all fields and joins them in the form `field=value` and adds them to the base_url.  
+When called with a URL-`String` (the `url_base`), this method will first add a `?` (start of a url-query-part), to the given URL.
+It then iterates over all fields and add them in the form `field=value`, to the current url-`String`.  
 If the `struct` has more than one field, the pairs are concatenated with an `&` (ampersand).  
-`Vec`s are treated specially (only one dimensional `Vec`s are supported): Their values are all joined with a url-encoded space character which is the `%20`.
+`Vec`s are treated slightly special (only one dimensional `Vec`s are supported):  
+Their values are all joined with a url-encoded space character (`%20`).
 
 
 ## Example
