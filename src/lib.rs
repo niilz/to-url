@@ -48,7 +48,7 @@ fn query_from_field_and_value(
 ) -> impl Iterator<Item = proc_macro2::TokenStream> + '_ {
     let fields = fields.iter().map(|field| {
         let field_ident = field.ident.as_ref().unwrap();
-        if let Some(ref path_seg) = get_vec(&field) {
+        if is_vec(&field) {
             join_values(field_ident)
         } else {
             quote! { + &format!("{}={:?}&", stringify!(#field_ident), self.#field_ident) }
@@ -57,7 +57,7 @@ fn query_from_field_and_value(
     fields
 }
 
-fn get_vec(field: &Field) -> Option<&PathSegment> {
+fn is_vec(field: &Field) -> bool {
     let field_ident = field.ident.as_ref().unwrap();
     match &field.ty {
         Type::Path(TypePath {
@@ -67,13 +67,11 @@ fn get_vec(field: &Field) -> Option<&PathSegment> {
             // segments is of Type syn::punctuated::Punctuated<PathSegment, _>
             if let Some(path_seg) = segments.first() {
                 let ident = &path_seg.ident;
-                if ident == "Vec" {
-                    return Some(path_seg);
-                }
+                return ident == "Vec";
             }
-            None
+            false
         }
-        _ => None,
+        _ => false,
     }
 }
 
