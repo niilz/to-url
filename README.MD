@@ -16,7 +16,7 @@ Note: This is not a macro for production!
 If the derive attribute `ToUrl` is added to a struct (only structs are supported) then a  
 `to_url(&self, base_url: String) -> String` method gets implemented for that struct.  
 When called with a URL-`String` (the `url_base`), this method will first add a `?` (start of a url-query-part), to the given URL.
-It then iterates over all fields and add them in the form `field=value`, to the current url-`String`.  
+It then iterates over all fields and adds them in the form `field=value`, to the current url-`String`.  
 If the `struct` has more than one field, the pairs are concatenated with an `&` (ampersand).  
 `Vec`s are treated slightly special (only one dimensional `Vec`s are supported):  
 Their values are all joined with a url-encoded space character (`%20`).
@@ -28,7 +28,7 @@ Their values are all joined with a url-encoded space character (`%20`).
 // This example must be in a different crate than *to-url* (because proc_macros must be defined in their own crates)
 
 
-// Annotate a struct with named fields
+// Annotate a struct (with named fields) with the ToUrl-derive (macro)
 #[derive(ToUrl)]
 pub struct Request<'a> {
     response_type: &'a str,
@@ -77,11 +77,12 @@ mod tests {
 
 ## What is this macro good for?
 
-First of all this macro should probably not being used for anything but experimenting or learning.
-But the example here came from the idea to contruct an [openid-connect request url](https://developers.google.com/identity/protocols/oauth2/openid-connect).
+First of all this macro should probably not be used for anything else but experimenting or learning.
+But the example here came from the idea to construct an [openid-connect request url](https://developers.google.com/identity/protocols/oauth2/openid-connect).
 And since I already had a `struct` in my dummy-project, with all the fields named like the query-parameters, I thougth it would be nice to use the field names directly. And proc_macros are the only option to do so.
-Other solutions (most likely more suited here) are:
-- have a simple manually coded `to_url` method where the field names are just typed out again
+Other solutions (most likely even more suited here) are:
+- have a simple manually coded `to_url` method on the struct, where the field names are just repeated again by hand.
 - use a `HashMap` that contains the necessary request-parameters. That might actually get rid of the struct all together if it is just a data-holder and does not provide much more functionality.
 
-For this specific use case though, the macro works fine, it expresses the intend and the benefit is a typed `struct` where one can add or remove fields and the will be automatically embedded/excluded in the final query.
+For this specific use case though, the macro works fine.
+It expresses the intend with the benefit of having a typed `struct`, where one can add or remove fields and they will be automatically embedded/excluded in the final url-query-part.
