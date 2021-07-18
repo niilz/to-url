@@ -3,8 +3,8 @@ extern crate proc_macro;
 use proc_macro::TokenStream;
 use quote::quote;
 use syn::{
-    self, parse::ParseStream, parse_macro_input, punctuated::Punctuated, token::Comma, Data,
-    DataStruct, DeriveInput, Field, Fields, Ident, Path, PathSegment, Type, TypePath,
+    self, parse_macro_input, punctuated::Punctuated, token::Comma, Data, DataStruct, DeriveInput,
+    Field, Fields, Ident, Path, Type, TypePath,
 };
 
 const URL_SPACE: &'static str = "%20";
@@ -23,18 +23,13 @@ pub fn to_url(tokens: TokenStream) -> TokenStream {
         _ => panic!("Only structs with named fields can be annotated with ToUrl"),
     };
 
-    let fields_str = format!("{:?}", fields_punct);
-
     let query_parts = query_from_field_and_value(&fields_punct);
 
     let modified = quote! {
         impl<'a> #name<'a> {
-            pub fn to_url(&self, url: String) -> String {
+            pub fn to_url(&self, base_url: String) -> String {
 
-                let url = format!("{}?", url) #(#query_parts)*;
-
-                println!("URL: {}", url);
-                println!("fields_str: {}", #fields_str);
+                let url = format!("{}?", base_url) #(#query_parts)*;
 
                 url
             }
@@ -59,7 +54,6 @@ fn query_from_field_and_value(
 }
 
 fn is_vec(field: &Field) -> bool {
-    let field_ident = field.ident.as_ref().unwrap();
     match &field.ty {
         Type::Path(TypePath {
             path: Path { segments, .. },
