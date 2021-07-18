@@ -46,12 +46,13 @@ pub fn to_url(tokens: TokenStream) -> TokenStream {
 fn query_from_field_and_value(
     fields: &Punctuated<Field, Comma>,
 ) -> impl Iterator<Item = proc_macro2::TokenStream> + '_ {
-    let fields = fields.iter().map(|field| {
+    let fields = fields.iter().enumerate().map(move |(i, field)| {
         let field_ident = field.ident.as_ref().unwrap();
+        let delim = if i < fields.len() - 1 { "&" } else { "" };
         if is_vec(&field) {
             join_values(field_ident)
         } else {
-            quote! { + &format!("{}={:?}&", stringify!(#field_ident), self.#field_ident) }
+            quote! { + &format!("{}={}{}", stringify!(#field_ident), self.#field_ident, #delim) }
         }
     });
     fields
