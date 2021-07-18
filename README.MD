@@ -9,7 +9,7 @@ This library has been developed to try out how procedural macros in Rust, specif
 - [proc_macro2 1.0](https://docs.rs/proc-macro2/1.0.27/proc_macro2/index.html)
 
 
-## What is does
+## What it does
 
 Note: This is not a macro for production!
 
@@ -22,7 +22,7 @@ If the `struct` has more than one field, the pairs are concatenated with an `&` 
 
 ## Example
 
-```
+```rust
 // This example must be in a different crate than *to-url* (because proc_macros must be defined in their own crates)
 
 
