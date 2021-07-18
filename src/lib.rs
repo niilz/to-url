@@ -4,8 +4,10 @@ use proc_macro::TokenStream;
 use quote::quote;
 use syn::{
     self, parse::ParseStream, parse_macro_input, punctuated::Punctuated, token::Comma, Data,
-    DataStruct, DeriveInput, Field, Fields, Path, PathSegment, Type, TypePath,
+    DataStruct, DeriveInput, Field, Fields, Ident, Path, PathSegment, Type, TypePath,
 };
+
+const URL_SPACE: &'static str = "%20";
 
 #[proc_macro_derive(ToUrl)]
 pub fn to_url(tokens: TokenStream) -> TokenStream {
@@ -47,9 +49,9 @@ fn query_from_field_and_value(
     let fields = fields.iter().map(|field| {
         let field_ident = field.ident.as_ref().unwrap();
         if let Some(ref path_seg) = get_vec(&field) {
-            join_values(path_seg).unwrap()
+            join_values(field_ident)
         } else {
-            quote! { + &format!("{}={:?}&", stringify!(#field), self.#field_ident) }
+            quote! { + &format!("{}={:?}&", stringify!(#field_ident), self.#field_ident) }
         }
     });
     fields
@@ -75,7 +77,20 @@ fn get_vec(field: &Field) -> Option<&PathSegment> {
     }
 }
 
-fn join_values(vec: &PathSegment) -> Option<proc_macro2::TokenStream> {
-    let ident = &vec.ident;
-    Some(quote! {+ &format!("###{:?}###", stringify!(#ident))})
+fn join_values(field_ident: &Ident) -> proc_macro2::TokenStream {
+    let len = quote! { self.#field_ident.len() };
+    let vec_values = quote! {
+        //let len = self.#field_ident.len();
+        self.#field_ident.iter().enumerate().fold(String::new(), |mut vals, (i, v)| {
+            vals.push_str(v);
+            if (i < #len - 1) {
+                vals.push_str(#URL_SPACE);
+            }
+            if (i == #len - 1) {
+                vals.push('&');
+            }
+            vals
+        })
+    };
+    quote! {+ &format!("{}={}", stringify!(#field_ident), #vec_values)}
 }
