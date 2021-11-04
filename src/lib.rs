@@ -29,7 +29,7 @@ pub fn to_url(tokens: TokenStream) -> TokenStream {
         impl<'a> #name<'a> {
             pub fn to_url(&self, base_url: String) -> String {
 
-                let url = format!("{}?", base_url) #(#query_parts)*;
+                let url = format!("{}", base_url) #(#query_parts)*;
 
                 url
             }
